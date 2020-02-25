@@ -27,7 +27,7 @@ bearer_token = get_bearer_token(consumer_key, consumer_secret)
 def connect_stream(bearer_token):
     r = requests.get(
         TWITTER_API_URL + "/labs/1/tweets/stream/sample",
-        params={"format": "compact"},
+        params={"format": "detailed"},
         headers={"Authorization": f"Bearer {bearer_token}"},
         stream=True,
     )
