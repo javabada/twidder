@@ -1,46 +1,24 @@
+import os
 import requests
-from configparser import ConfigParser
 from kafka import KafkaProducer
+from .constants import TWITTER_API_URL, SAMPLED_STREAM_TOPIC
+from .helpers import get_bearer_token
 
-TWITTER_API_URL = "https://api.twitter.com"
-
-config = ConfigParser()
-config.read("config.ini")
-
-consumer_key = config["twitter"]["consumer_key"]
-consumer_secret = config["twitter"]["consumer_secret"]
-
-
-def get_bearer_token(consumer_key, consumer_secret):
-    r = requests.post(
-        TWITTER_API_URL + "/oauth2/token",
-        auth=(consumer_key, consumer_secret),
-        data={"grant_type": "client_credentials"},
-    )
-    body = r.json()
-    return body["access_token"]
-
+consumer_key = os.getenv("TWITTER_API_KEY")
+consumer_secret = os.getenv("TWITTER_API_SECRET")
 
 bearer_token = get_bearer_token(consumer_key, consumer_secret)
 
-
-def connect_stream(bearer_token):
-    r = requests.get(
-        TWITTER_API_URL + "/labs/1/tweets/stream/sample",
-        params={"format": "detailed"},
-        headers={"Authorization": f"Bearer {bearer_token}"},
-        stream=True,
-    )
-    return r.iter_lines()
-
-
 producer = KafkaProducer()
 
-lines = connect_stream(bearer_token)
+r = requests.get(
+    TWITTER_API_URL + "/labs/1/tweets/stream/sample",
+    params={"format": "detailed"},
+    headers={"Authorization": f"Bearer {bearer_token}"},
+    stream=True,
+)
 
-topic = config["kafka"]["topic"]
-
-for line in lines:
+for line in r.iter_lines():
     # filter out keep-alive new lines
     if line:
-        producer.send(topic, value=line)
+        producer.send(SAMPLED_STREAM_TOPIC, value=line)
