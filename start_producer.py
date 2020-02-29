@@ -38,7 +38,9 @@ producer = KafkaProducer()
 
 lines = connect_stream(bearer_token)
 
+topic = config["kafka"]["topic"]
+
 for line in lines:
     # filter out keep-alive new lines
     if line:
-        producer.send("twitter_sampled_stream", value=line)
+        producer.send(topic, value=line)
