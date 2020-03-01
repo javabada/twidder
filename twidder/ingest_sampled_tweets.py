@@ -1,8 +1,9 @@
 import os
-import requests
+
 from kafka import KafkaProducer
-from constants import TWITTER_API_URL, SAMPLED_STREAM_TOPIC
-from helpers import get_bearer_token
+
+from topics import SAMPLED_STREAM
+from twitter import get_bearer_token, stream_sampled_tweets
 
 consumer_key = os.getenv("TWITTER_API_KEY")
 consumer_secret = os.getenv("TWITTER_API_SECRET")
@@ -11,14 +12,9 @@ bearer_token = get_bearer_token(consumer_key, consumer_secret)
 
 producer = KafkaProducer()
 
-r = requests.get(
-    TWITTER_API_URL + "/labs/1/tweets/stream/sample",
-    params={"format": "detailed"},
-    headers={"Authorization": f"Bearer {bearer_token}"},
-    stream=True,
-)
+lines = stream_sampled_tweets(bearer_token)
 
-for line in r.iter_lines():
+for line in lines:
     # filter out keep-alive new lines
     if line:
-        producer.send(SAMPLED_STREAM_TOPIC, value=line)
+        producer.send(SAMPLED_STREAM, value=line)

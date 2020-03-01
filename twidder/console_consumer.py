@@ -1,10 +1,12 @@
 import json
-from kafka import KafkaConsumer
 from pprint import pprint
-from constants import SAMPLED_STREAM_TOPIC
+
+from kafka import KafkaConsumer
+
+from topics import SAMPLED_STREAM
 
 consumer = KafkaConsumer(
-    SAMPLED_STREAM_TOPIC,
+    SAMPLED_STREAM,
     group_id="console.consumer",
     value_deserializer=lambda v: json.loads(v.decode("utf-8")),
 )
