@@ -3,7 +3,8 @@ import os
 from kafka import KafkaProducer
 
 from topics import SAMPLED_STREAM
-from twitter import get_bearer_token, stream_sampled_tweets
+from twitter import get_bearer_token
+from twitter import stream_sampled_tweets
 
 consumer_key = os.getenv("TWITTER_API_KEY")
 consumer_secret = os.getenv("TWITTER_API_SECRET")
