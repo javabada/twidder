@@ -1,17 +1,12 @@
 import json
-from configparser import ConfigParser
 from kafka import KafkaConsumer
 from pprint import pprint
-
-config = ConfigParser()
-config.read("config.ini")
-
-topic = config["kafka"]["topic"]
+from constants import SAMPLED_STREAM_TOPIC
 
 consumer = KafkaConsumer(
-    topic,
+    SAMPLED_STREAM_TOPIC,
+    group_id="console.consumer",
     value_deserializer=lambda v: json.loads(v.decode("utf-8")),
-    auto_offset_reset="earliest",
 )
 
 for msg in consumer:

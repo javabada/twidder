@@ -1,8 +1,8 @@
 import os
 import requests
 from kafka import KafkaProducer
-from .constants import TWITTER_API_URL, SAMPLED_STREAM_TOPIC
-from .helpers import get_bearer_token
+from constants import TWITTER_API_URL, SAMPLED_STREAM_TOPIC
+from helpers import get_bearer_token
 
 consumer_key = os.getenv("TWITTER_API_KEY")
 consumer_secret = os.getenv("TWITTER_API_SECRET")
