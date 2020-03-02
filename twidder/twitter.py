@@ -25,10 +25,31 @@ def stream_sampled_tweets(bearer_token):
     return r.iter_lines()
 
 
+def stream_filtered_tweets(bearer_token):
+    r = requests.get(
+        TWITTER_API_URL + "/labs/1/tweets/stream/filter",
+        params={"format": "detailed"},
+        headers={"Authorization": f"Bearer {bearer_token}"},
+        stream=True,
+    )
+    r.raise_for_status()
+    return r.iter_lines()
+
+
 def get_filtered_stream_rules(bearer_token):
     r = requests.get(
         TWITTER_API_URL + "/labs/1/tweets/stream/filter/rules",
         headers={"Authorization": f"Bearer {bearer_token}"},
+    )
+    r.raise_for_status()
+    return r.json()
+
+
+def delete_filtered_stream_rules(ids, bearer_token):
+    r = requests.post(
+        TWITTER_API_URL + "/labs/1/tweets/stream/filter/rules",
+        headers={"Authorization": f"Bearer {bearer_token}"},
+        json={"delete": {"ids": ids}},
     )
     r.raise_for_status()
     return r.json()
@@ -42,14 +63,3 @@ def set_filtered_stream_rules(rules, bearer_token):
     )
     r.raise_for_status()
     return r.json()
-
-
-def stream_filtered_tweets(bearer_token):
-    r = requests.get(
-        TWITTER_API_URL + "/labs/1/tweets/stream/filter",
-        params={"format": "detailed"},
-        headers={"Authorization": f"Bearer {bearer_token}"},
-        stream=True,
-    )
-    r.raise_for_status()
-    return r.iter_lines()
