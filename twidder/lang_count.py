@@ -1,12 +1,9 @@
-from configparser import ConfigParser
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json
-from pyspark.sql.types import StructType, StringType
+from pyspark.sql.types import StringType
+from pyspark.sql.types import StructType
 
-config = ConfigParser()
-config.read("config.ini")
-
-topic = config["kafka"]["topic"]
+from topics import SAMPLED_STREAM
 
 spark = SparkSession.builder.appName("lang_count").getOrCreate()
 
@@ -15,7 +12,7 @@ spark.sparkContext.setLogLevel("WARN")
 df = (
     spark.readStream.format("kafka")
     .option("kafka.bootstrap.servers", "localhost:9092")
-    .option("subscribe", topic)
+    .option("subscribe", SAMPLED_STREAM)
     .option("startingOffsets", "earliest")
     .load()
     .selectExpr("CAST(value AS STRING)")
